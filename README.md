@@ -1,0 +1,1 @@
+Distributed systems have always fascinated me, and I wanted to learn how to build them using Go. I’m using fly.io’s Distributed Systems course (https://fly.io/dist-sys/) as a guide to dive into both distributed systems and Go.
