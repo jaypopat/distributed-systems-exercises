@@ -2,8 +2,8 @@ BIN_DIR := bin
 MAELSTROM := ./maelstrom/maelstrom/maelstrom
 
 # the challenges ive completed, so they can be built and tested
-BINARIES := echo unique-id broadcast-a broadcast-b broadcast-c
-# grow-only kafka kv
+BINARIES := echo unique-id broadcast-a broadcast-b broadcast-c grow-only
+# kafka kv
 
 .PHONY: all build clean $(BINARIES) test-echo test-unique-id test-broadcast-a test-broadcast-b test-broadcast-c test-grow-only test-kafka test-kv
 
@@ -36,11 +36,14 @@ broadcast-d:
 	@mkdir -p $(BIN_DIR)
 	go build -o $(BIN_DIR)/maelstrom-broadcast-d ./cmd/broadcast/sol-d
 
+broadcast-e:
+	@mkdir -p $(BIN_DIR)
+	go build -o $(BIN_DIR)/maelstrom-broadcast-e ./cmd/broadcast/sol-e
 
 
 grow-only:
 	@mkdir -p $(BIN_DIR)
-	go build -o $(BIN_DIR)/maelstrom-grow-only ./cmd/grow-only
+	go build -o $(BIN_DIR)/maelstrom-counter ./cmd/grow-only
 
 kafka:
 	@mkdir -p $(BIN_DIR)
@@ -71,9 +74,12 @@ test-broadcast-c: broadcast-c
 test-broadcast-d: broadcast-d
 	$(MAELSTROM) test -w broadcast --bin ./$(BIN_DIR)/maelstrom-broadcast-d --node-count 25 --time-limit 20 --rate 100 --latency 100
 
+test-broadcast-e: broadcast-e
+	$(MAELSTROM) test -w broadcast --bin ./$(BIN_DIR)/maelstrom-broadcast-e --node-count 25 --time-limit 20 --rate 100 --latency 100
+
 
 test-grow-only: grow-only
-	$(MAELSTROM) test -w g-counter --bin ./$(BIN_DIR)/maelstrom-grow-only --node-count 3 --rate 100 --time-limit 20 --nemesis partition
+	$(MAELSTROM) test -w g-counter --bin ./$(BIN_DIR)/maelstrom-counter --node-count 3 --rate 100 --time-limit 20 --nemesis partition
 
 test-kafka: kafka
 	$(MAELSTROM) test -w kafka --bin ./$(BIN_DIR)/maelstrom-kafka --node-count 1 --concurrency 2n --time-limit 20 --rate 1000
