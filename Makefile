@@ -2,8 +2,8 @@ BIN_DIR := bin
 MAELSTROM := ./maelstrom/maelstrom/maelstrom
 
 # the challenges ive completed, so they can be built and tested
-BINARIES := echo unique-id broadcast-a broadcast-b broadcast-c grow-only
-# kafka kv
+BINARIES := echo unique-id broadcast-a broadcast-b broadcast-c grow-only kafka
+# kv
 
 .PHONY: all build clean $(BINARIES) test-echo test-unique-id test-broadcast-a test-broadcast-b test-broadcast-c test-grow-only test-kafka test-kv
 
@@ -45,9 +45,18 @@ grow-only:
 	@mkdir -p $(BIN_DIR)
 	go build -o $(BIN_DIR)/maelstrom-counter ./cmd/grow-only
 
-kafka:
+kafka-a:
 	@mkdir -p $(BIN_DIR)
-	go build -o $(BIN_DIR)/maelstrom-kafka ./cmd/kafka
+	go build -o $(BIN_DIR)/maelstrom-kafka-a ./cmd/kafka/sol-a
+
+kafka-b:
+	@mkdir -p $(BIN_DIR)
+	go build -o $(BIN_DIR)/maelstrom-kafka-b ./cmd/kafka/sol-b
+
+kafka-c:
+	@mkdir -p $(BIN_DIR)
+	go build -o $(BIN_DIR)/maelstrom-kafka-c ./cmd/kafka/sol-c
+
 
 kv:
 	@mkdir -p $(BIN_DIR)
@@ -81,8 +90,16 @@ test-broadcast-e: broadcast-e
 test-grow-only: grow-only
 	$(MAELSTROM) test -w g-counter --bin ./$(BIN_DIR)/maelstrom-counter --node-count 3 --rate 100 --time-limit 20 --nemesis partition
 
-test-kafka: kafka
-	$(MAELSTROM) test -w kafka --bin ./$(BIN_DIR)/maelstrom-kafka --node-count 1 --concurrency 2n --time-limit 20 --rate 1000
+test-kafka-a: kafka-a
+	$(MAELSTROM) test -w kafka --bin ./$(BIN_DIR)/maelstrom-kafka-a --node-count 1 --concurrency 2n --time-limit 20 --rate 1000
+
+test-kafka-b: kafka-b
+	$(MAELSTROM) test -w kafka --bin ./$(BIN_DIR)/maelstrom-kafka-b --node-count 2 --concurrency 2n --time-limit 20 --rate 1000
+
+test-kafka-c: kafka-c
+	$(MAELSTROM) test -w kafka --bin ./$(BIN_DIR)/maelstrom-kafka-c --node-count 2 --concurrency 2n --time-limit 20 --rate 1000
+
+
 
 test-kv: kv
 	$(MAELSTROM) test -w lin-kv --bin ./$(BIN_DIR)/maelstrom-kv --node-count 1 --time-limit 20 --rate 1000 --concurrency 2n --consistency-models read-uncommitted --availability total
